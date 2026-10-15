@@ -2,9 +2,12 @@
 
 ## 编译与运行(Linux / WSL)
 
+可执行文件输出到 `build/` 目录,该目录已被 `.gitignore` 忽略。
+
 ```
-gcc -Wall -Wextra -o osh osh.c
-./osh
+mkdir -p build
+gcc -Wall -Wextra -o build/osh osh.c
+./build/osh
 ```
 
 ## 设计说明

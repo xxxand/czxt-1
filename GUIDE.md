@@ -14,15 +14,16 @@
 |---|---|
 | `Lab01.md` | 作业题目(英文):要求写一个带历史记录功能的 Shell |
 | `osh.c` | 作业的答案,即全部源代码(150 行 C 语言) |
-| `osh` | 用 `gcc` 把 `osh.c` 编译出来的可执行程序(ELF 二进制,不能当文本读) |
+| `build/osh` | 用 `gcc` 把 `osh.c` 编译出来的可执行程序(ELF 二进制,不能当文本读),由编译命令生成,不纳入版本控制 |
 | `README.md` | 设计说明(中文):怎么编译、设计思路 |
 | `GUIDE.md` | 就是本文 |
 
 编译并运行:
 
 ```bash
-gcc -Wall -Wextra -o osh osh.c
-./osh
+mkdir -p build
+gcc -Wall -Wextra -o build/osh osh.c
+./build/osh
 ```
 
 ---
