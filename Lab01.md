@@ -14,13 +14,13 @@ This project consists of designing a C program to serve as a shell interface tha
 
 A shell interface gives the user a prompt, after which the next command is entered. The example below illustrates the prompt such as `osh>` and the user's next command: `cat prog.c`. (This command displays the file `prog.c` on the terminal using the UNIX `cat` command.)
 
-```text
+```bash
 osh> cat prog.c
 ```
 
 One technique for implementing a shell interface is to have the parent process first read what the user enters on the command line (in this case, `cat prog.c`), and then create a separate child process that performs the command. Unless otherwise specified, the parent process waits for the child to exit before continuing. However, UNIX shells typically also allow the child process to run in the background, or concurrently. To accomplish this, we add an ampersand (`&`) at the end of the command. Thus, if we rewrite the above command as
 
-```text
+```bash
 osh> cat prog.c &
 ```
 
@@ -34,12 +34,10 @@ A C program that provides the general operations of a command-line shell is supp
 #include <stdio.h>
 #include <unistd.h>
 #define MAX_LINE 80 /* The maximum length command */
-int main(void)
-{
+int main(void) {
     char *args[MAX_LINE / 2 + 1]; /* command line arguments */
     int should_run = 1; /* flag to determine when to exit program */
-    while (should_run)
-    {
+    while (should_run) {
         printf("osh>");
         fflush(stdout);
         /**
