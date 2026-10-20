@@ -134,7 +134,7 @@ mkdir -p build && gcc -std=c99 -O2 -Wall -fno-asm osh.c -o build/osh --static -l
 
 ### 4.2 错误处理
 
-输入：`!!`（历史为空）、`!5`、`history`、`abc`、`!abc`、`!0`、`!3x`、`!99999999999999999999`
+输入：`!!`（历史为空）、`!5`、`history`、`abc`、`!abc`、`!0`、`!3x`、`!9999999999999999999999999999999999999999`
 
 ![osh-4-2](image-2.png)
 
