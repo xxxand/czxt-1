@@ -1,42 +1,35 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
-#define MAX_LINE 80 /* The maximum length command */
+#define MAX_LINE 80
 #define HISTORY_SIZE 10
 
 static char history[HISTORY_SIZE][MAX_LINE + 1];
-static int total = 0; /* number of commands entered so far; also the number of the latest one */
+static int total = 0;
 
-static void add_history(const char *cmd)
-{
+static void add_history(const char* cmd) {
     strcpy(history[total % HISTORY_SIZE], cmd);
     total++;
 }
 
-/* Command number n is available if it is one of the last HISTORY_SIZE commands. */
-static const char *get_history(int n)
-{
-    if (n < 1 || n > total || n <= total - HISTORY_SIZE)
-        return NULL;
+static const char* get_history(int n) {
+    if (n < 1 || n > total || n <= total - HISTORY_SIZE) return NULL;
     return history[(n - 1) % HISTORY_SIZE];
 }
 
-static void print_history(void)
-{
+static void print_history(void) {
     for (int n = total; n >= 1 && n > total - HISTORY_SIZE; n--)
         printf("%d %s\n", n, get_history(n));
 }
 
-/* Split line into args in place; returns the number of tokens and sets *background if it ends with '&'. */
-static int parse(char *line, char *args[], int *background)
-{
+static int parse(char* line, char* args[], int* background) {
     int argc = 0;
-    char *tok = strtok(line, " \t\n");
+    char* tok = strtok(line, " \t\n");
     while (tok != NULL && argc < MAX_LINE / 2) {
         args[argc++] = tok;
         tok = strtok(NULL, " \t\n");
@@ -57,22 +50,17 @@ static int parse(char *line, char *args[], int *background)
     return argc;
 }
 
-static void reap_background(void)
-{
-    while (waitpid(-1, NULL, WNOHANG) > 0)
-        ;
-}
+static void reap_background(void) { while (waitpid(-1, NULL, WNOHANG) > 0); }
 
-int main(void)
-{
-    char *args[MAX_LINE / 2 + 1]; /* command line arguments */
-    int should_run = 1;           /* flag to determine when to exit program */
-    char input[MAX_LINE + 2];     /* room for '\n' and '\0' */
+int main(void) {
+    char* args[MAX_LINE / 2 + 1];
+    int should_run = 1;
+    char input[MAX_LINE + 2];
     char line[MAX_LINE + 1];
 
     while (should_run) {
         reap_background();
-        printf("osh>");
+        printf("osh> ");
         fflush(stdout);
 
         if (fgets(input, sizeof(input), stdin) == NULL) {
@@ -81,21 +69,19 @@ int main(void)
         }
         if (strchr(input, '\n') == NULL && !feof(stdin)) {
             int c;
-            while ((c = getchar()) != '\n' && c != EOF)
-                ;
+            while ((c = getchar()) != '\n' && c != EOF);
             printf("Command too long (at most %d characters).\n", MAX_LINE);
             continue;
         }
         input[strcspn(input, "\n")] = '\0';
 
         /* skip blank lines */
-        if (input[strspn(input, " \t")] == '\0')
-            continue;
+        if (input[strspn(input, " \t")] == '\0') continue;
 
         /* history retrieval: !! and !N */
-        char *p = input + strspn(input, " \t");
+        char* p = input + strspn(input, " \t");
         if (p[0] == '!') {
-            const char *cmd = NULL;
+            const char* cmd = NULL;
             if (strcmp(p, "!!") == 0) {
                 if (total == 0) {
                     printf("No commands in history.\n");
@@ -103,16 +89,17 @@ int main(void)
                 }
                 cmd = get_history(total);
             } else {
-                char *end;
+                char* end;
                 errno = 0;
                 long n = strtol(p + 1, &end, 10);
-                if (end == p + 1 || *end != '\0' || errno != 0 || n > total || (cmd = get_history((int)n)) == NULL) {
+                if (end == p + 1 || *end != '\0' || errno != 0 || n > total ||
+                    (cmd = get_history((int)n)) == NULL) {
                     printf("No such command in history.\n");
                     continue;
                 }
             }
             strcpy(input, cmd);
-            printf("%s\n", input); /* echo the retrieved command */
+            printf("%s\n", input);
         }
 
         add_history(input);
@@ -120,8 +107,7 @@ int main(void)
         strcpy(line, input);
         int background;
         int argc = parse(line, args, &background);
-        if (argc == 0)
-            continue;
+        if (argc == 0) continue;
 
         if (strcmp(args[0], "exit") == 0) {
             should_run = 0;
